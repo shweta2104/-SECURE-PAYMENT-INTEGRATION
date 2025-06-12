@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Checkout";
+    var razorpayKey = ViewBag.RazorpayKey as string;
+    var orderId = ViewBag.RazorpayOrderId as string;
+    var amountInPaise = (int)ViewBag.Amount;
+    var amountInRupees = (decimal)ViewBag.AmountInRupees;
+}
+
+<h2>Checkout</h2>
+
+<p>Total Amount: ₹@amountInRupees</p>
+
+<!-- Razorpay Checkout button -->
+<button id="rzp-button1">Pay Now</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    var options = {
+        "key": "@razorpayKey", // Enter the Key ID generated from the Dashboard
+        "amount": "@amountInPaise", // Amount is in currency subunits. Default currency is INR. Hence, 100 = 1 INR
+        "currency": "INR",
+        "name": "Econest",
+        "description": "Test Transaction",
+        "order_id": "@orderId", //This is a sample Order ID. Pass the `id` obtained in the response of create order API
+        "handler": function (response){
+            alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+            // You can send the payment ID, order ID to your backend for verification and processing
+            // e.g., via AJAX POST
+        },
+        "prefill": {
+            "name": "", // optional - fill user data if available
+            "email": ""
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+
+    var rzp1 = new Razorpay(options);
+
+    document.getElementById('rzp-button1').onclick = function(e){
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>

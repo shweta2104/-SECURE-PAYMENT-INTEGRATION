@@ -1,0 +1,131 @@
+﻿@model List<tblorder>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["msg"]
+    </div>
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/css/order.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="form-box">
+                <h3>Checkout</h3>
+                <form method="post" asp-action="orderin">
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Full Name:</label>
+                                <input type="text" name="name" class="form-control" placeholder="Enter your name" />
+                            </div>
+
+                            <label>Total Amount:</label>
+                            <input type="text" name="total_amt" class="form-control" value="@ViewBag.Total" readonly />
+
+                            <div class="mb-3">
+                                <label>Payment Method:</label>
+                                <select name="p_method" id="paymentMethod" class="form-select" onchange="showPaymentView()">
+                                    <option value="" disabled selected>Select payment method</option>
+                                    <option value="cash">Cash on Delivery</option>
+                                    <option value="credit">Credit Card/ Debit Card</option>
+                                    <option value="net">Net Banking</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Address Line 1:</label>
+                                <input type="text" name="address1" class="form-control" placeholder="Enter Address Line 1" />
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label>Address Line 2:</label>
+                                <input type="text" name="address" class="form-control" placeholder="Enter your address" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label>State:</label>
+                                <input type="text" name="address" class="form-control" placeholder="Enter your state" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Pincode:</label>
+                                <input type="text" name="address" class="form-control" placeholder="Enter your pincode" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Contact No:</label>
+                                <input type="text" name="contact" class="form-control" placeholder="Enter your contact number" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="paymentMethodView">
+                        <!-- Payment method view will be loaded here -->
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success px-5 py-2">Place Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function showPaymentView() {
+            var paymentMethod = document.getElementById("paymentMethod").value;
+            var paymentMethodViewDiv = document.getElementById("paymentMethodView");
+
+            if (paymentMethod === "credit") {
+                $.ajax({
+                    url: '@Url.Action("GetCreditCardView", "payment")',
+                    type: 'GET',
+                    success: function (result) {
+                        paymentMethodViewDiv.innerHTML = result;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading Credit Card View:", error);
+                        paymentMethodViewDiv.innerHTML = "<p class='text-danger'>Error loading payment view.</p>";
+                    }
+                });
+            } else if (paymentMethod === "net") {
+                $.ajax({
+                    url: '@Url.Action("GetNetBankingView", "payment")',
+                    type: 'GET',
+                    success: function (result) {
+                        paymentMethodViewDiv.innerHTML = result;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading Net Banking View:", error);
+                        paymentMethodViewDiv.innerHTML = "<p class='text-danger'>Error loading payment view.</p>";
+                    }
+                });
+            } else if (paymentMethod === "cash") {
+                $.ajax({
+                    url: '@Url.Action("GetCashOnDeliveryView", "payment")',
+                    type: 'GET',
+                    success: function (result) {
+                        paymentMethodViewDiv.innerHTML = result;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error loading Cash on Delivery View:", error);
+                        paymentMethodViewDiv.innerHTML = "<p class='text-danger'>Error loading payment view.</p>";
+                    }
+                });
+            } else {
+                paymentMethodViewDiv.innerHTML = "";
+            }
+        }
+    </script>
+}
